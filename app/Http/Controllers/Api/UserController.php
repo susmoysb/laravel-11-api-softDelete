@@ -55,4 +55,26 @@ class UserController extends Controller
             'message' => 'User deletion failed.',
         ]);
     }
+
+    /**
+     * Restore the specified resource from storage.
+     *
+     * uses route model binding to automatically inject the User model instance corresponding to the provided user ID.
+     * route model binding for trashed models is enabled by chaining the withTrashed() method to the route definition.
+     */
+    public function restore(User $user)
+    {
+        if ($user->trashed() && $user->restore()) {
+            return response()->json([
+                'status' => 'success',
+                'data' => $user,
+                'message' => 'User restored successfully.',
+            ]);
+        }
+
+        return response()->json([
+            'status' => 'error',
+            'message' => 'User restoration failed.',
+        ]);
+    }
 }
