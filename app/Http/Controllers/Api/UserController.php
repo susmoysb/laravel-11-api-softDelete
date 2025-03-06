@@ -42,7 +42,7 @@ class UserController extends Controller
      */
     public function destroy(User $user)
     {
-        if ($user->delete()) {
+        if (!$user->trashed() && $user->delete()) {
             return response()->json([
                 'status' => 'success',
                 'data' => $user,

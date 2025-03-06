@@ -47,4 +47,11 @@ class User extends Authenticatable
             'password' => 'hashed',
         ];
     }
+
+    // customize how the model is retrieved by overriding the resolveRouteBinding method in User model so that it always includes soft-deleted models.
+    public function resolveRouteBinding($value, $field = null)
+    {
+        $field = $field ?? $this->getRouteKeyName();
+        return $this->withTrashed()->where($field, $value)->firstOrFail();
+    }
 }
