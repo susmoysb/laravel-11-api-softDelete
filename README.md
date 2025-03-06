@@ -61,3 +61,35 @@ $this->app->booted(function () {
     }
 });
 ```
+
+## Option 4
+
+### Explicit custom bindings via the Route facade
+
+**Create the Service Provider**
+
+Run the following Artisan command to generate the provider:
+
+```bash
+php artisan make:provider RouteBindingServiceProvider
+```
+When invoking the `make:provider` Artisan command, Laravel automatically adds the generated provider to the bootstrap/providers.php file.
+
+Inside boot() method of `RouteBindingServiceProvider`, place the below code
+
+```php
+// Array mapping route parameters to model classes
+$bindings = [
+    'user'    => \App\Models\User::class,
+    // Add more model bindings as needed...
+];
+
+// Register each binding
+foreach ($bindings as $parameter => $modelClass) {
+    Route::bind($parameter, function ($value) use ($modelClass) {
+        return $modelClass::withTrashed()
+            ->where((new $modelClass)->getRouteKeyName(), $value)
+            ->first();
+    });
+}
+```
