@@ -31,3 +31,33 @@ public function resolveRouteBinding($value, $field = null)
     return $this->withTrashed()->where($field, $value)->firstOrFail();
 }
 ```
+
+## Option 3
+
+**Create the Service Provider**
+
+Run the following Artisan command to generate the provider:
+
+```bash
+php artisan make:provider TrashedRouteBindingServiceProvider
+```
+When invoking the `make:provider` Artisan command, Laravel automatically adds the generated provider to the bootstrap/providers.php file.
+
+Inside boot() method of `TrashedRouteBindingServiceProvider`, place the below code
+
+```php
+// Wait until the application has fully booted
+$this->app->booted(function () {
+    // List of route parameter names that require soft-deleted binding
+    $trashedParameters = ['user', 'post', 'comment', 'article', 'category'];
+
+    // Loop through all registered routes
+    foreach (Route::getRoutes() as $route) {
+        // Check if the route uses any of the specified parameters
+        if (count(array_intersect($route->parameterNames(), $trashedParameters)) > 0) {
+            // Enable soft-deleted (trashed) model binding for this route
+            $route->withTrashed();
+        }
+    }
+});
+```
